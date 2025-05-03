@@ -1,0 +1,37 @@
+openapi: 3.0.0
+info:
+  title: WOW PKM API
+  description: API for managing workspaces, pages, and blocks in the PKM system
+  version: 1.0.0
+servers:
+  - url: /api
+    description: Default server
+components:
+  schemas:
+    Workspace:
+      $ref: 'components/schemas.yaml#/Workspace'
+    CreatePageDto:
+      $ref: 'components/schemas.yaml#/CreatePageDto'
+    UpdatePageDto:
+      $ref: 'components/schemas.yaml#/UpdatePageDto'
+    Page:
+      $ref: 'components/schemas.yaml#/Page'
+    Block:
+      $ref: 'components/schemas.yaml#/Block'
+    SyncBlockDto:
+      $ref: 'components/schemas.yaml#/SyncBlockDto'
+    Error:
+      $ref: 'components/schemas.yaml#/Error'
+paths:
+  /workspaces:
+    $ref: 'paths/paths.yaml#/workspaces'
+  /workspaces/{id}:
+    $ref: 'paths/paths.yaml#/workspaces~1{id}'
+  /pages:
+    $ref: 'paths/paths.yaml#/pages'
+  /pages/{id}:
+    $ref: 'paths/paths.yaml#/pages~1{id}'
+  /blocks/{pageId}:
+    $ref: 'paths/paths.yaml#/blocks/{pageId}'
+  /blocks/{pageId}/sync:
+    $ref: 'paths/paths.yaml#/blocks/{pageId}/sync'

@@ -1,0 +1,18 @@
+services:
+  postgres_notion:
+    image: postgres:16
+    container_name: postgres_pkm
+    restart: always
+    environment:
+      POSTGRES_USER: pkm_user
+      POSTGRES_PASSWORD: pkm_password
+      POSTGRES_DB: pkm_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ../database/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pkm_user -d pkm_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

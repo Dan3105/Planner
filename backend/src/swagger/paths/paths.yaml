@@ -1,0 +1,239 @@
+workspaces:
+  get:
+    summary: Get all workspaces
+    operationId: getAllWorkspaces
+    responses:
+      '200':
+        description: A list of workspaces
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#components/schemas/Workspace'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+  post:
+    summary: Create a new workspace
+    operationId: createWorkspace
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              title:
+                type: string
+            required:
+              - title
+    responses:
+      '201':
+        description: Created workspace
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Workspace'
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+workspaces/{id}:
+  get:
+    summary: Get workspace by ID
+    operationId: getWorkspaceById
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Workspace details
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Workspace'
+      '404':
+        description: Workspace not found
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+  delete:
+    summary: Delete workspace by ID
+    operationId: deleteWorkspace
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Deleted workspace confirmation
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Workspace'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+pages:
+  post:
+    summary: Create a new page
+    operationId: createPage
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#components/schemas/CreatePageDto'
+    responses:
+      '201':
+        description: Created page
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Page'
+      '400':
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+pages/{id}:
+  put:
+    summary: Update a page
+    operationId: updatePage
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#components/schemas/UpdatePageDto'
+    responses:
+      '200':
+        description: Updated page
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Page'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+  delete:
+    summary: Delete a page
+    operationId: deletePage
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Deleted page confirmation
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Page'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+blocks/{pageId}:
+  get:
+    summary: Get all blocks for a page
+    operationId: getBlocksByPageId
+    parameters:
+      - name: pageId
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: A list of blocks for the page
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#components/schemas/Block'
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'
+blocks/{pageId}/sync:
+  post:
+    summary: Sync blocks (create, update, delete)
+    operationId: syncBlocks
+    parameters:
+      - name: pageId
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#components/schemas/SyncBlockDto'
+    responses:
+      '200':
+        description: Sync result
+        content:
+          application/json:
+            schema:
+              type: object
+      '500':
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: '#components/schemas/Error'

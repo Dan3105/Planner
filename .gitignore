@@ -1,0 +1,4 @@
+*.env
+/secrete/*
+/database/*
+/backend/generated/*

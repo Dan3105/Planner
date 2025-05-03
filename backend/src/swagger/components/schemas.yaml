@@ -1,0 +1,67 @@
+Workspace:
+  type: object
+  properties:
+    id:
+      type: string
+    title:
+      type: string
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+
+CreatePageDto:
+  type: object
+  properties:
+    title:
+      type: string
+    workspaceId:
+      type: string
+    parentId:
+      type: string
+    content:
+      type: object
+      description: BlockNote.js content JSON structure
+  required:
+    - title
+    - workspaceId
+
+UpdatePageDto:
+  type: object
+  properties:
+    title:
+      type: string
+    content:
+      type: object
+      description: BlockNote.js content JSON structure
+    parentId:
+      type: string
+
+Page:
+  type: object
+  properties:
+    id:
+      type: string
+    title:
+      type: string
+    workspaceId:
+      type: string
+    parentId:
+      type: string
+    content:
+      type: object
+      description: BlockNote.js content JSON structure
+    createdAt:
+      type: string
+      format: date-time
+    updatedAt:
+      type: string
+      format: date-time
+
+Error:
+  type: object
+  properties:
+    error:
+      type: string
