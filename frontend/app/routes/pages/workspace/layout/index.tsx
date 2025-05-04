@@ -9,6 +9,10 @@ import type { PageDto } from "~/api/dtos/page_dto";
 import { SidebarProvider, SidebarInset } from "~/components/ui/sidebar";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import { PageDialog } from "./PageDialog";
+import { DeletePageDialog } from "./DeletePageDialog";
+
+// Define a type for all possible page operations
+type PageOperationMode = "add" | "edit" | "delete" | null;
 
 export default function WorkspaceLayout() {
   // Get workspace ID from URL params
@@ -18,14 +22,18 @@ export default function WorkspaceLayout() {
   // Fetch workspace data
   const { data: workspace, isLoading } = useGetWorkspaceById(workspaceId as string);
 
-  // Dialog state management
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogMode, setDialogMode] = useState<"add" | "edit">("add");
-  const [currentPage, setCurrentPage] = useState<PageDto | undefined>();
+  // Unified page operation state
+  const [operationMode, setOperationMode] = useState<PageOperationMode>(null);
+  const [targetPage, setTargetPage] = useState<PageDto | null>(null);
+  const [parentPage, setParentPage] = useState<PageDto | null>(null);
 
   // Mutations for CRUD operations
   const createPageMutation = useCreatePage();
   const updatePageMetadataMutation = useUpdatePageMetadata();
+
+  // Dialog state getters
+  const isEditDialogOpen = operationMode === "edit" || operationMode === "add";
+  const isDeleteDialogOpen = operationMode === "delete";
 
   if (isLoading) {
     return <div className="flex items-center justify-center h-screen">Loading workspace...</div>;
@@ -40,40 +48,51 @@ export default function WorkspaceLayout() {
     navigate(`page/${pageId}`, { replace: true });
   };
 
-  // Open edit dialog
+  // Unified handlers for page operations
   const handleEditPage = (page: PageDto) => {
-    setCurrentPage(page);
-    setDialogMode("edit");
-    setIsDialogOpen(true);
+    setTargetPage(page);
+    setOperationMode("edit");
   };
 
-  // Open create dialog
-  const handleAddPage = () => {
-    setDialogMode("add");
-    setCurrentPage(undefined);
-    setIsDialogOpen(true);
+  const handleAddPage = (parentPage?: PageDto) => {
+    setTargetPage(null);
+    setParentPage(parentPage || null);
+    setOperationMode("add");
   };
 
-  // Handle dialog submission (create or update)
+  const handleDeletePage = (page: PageDto) => {
+    setTargetPage(page);
+    setOperationMode("delete");
+  };
+
+  // Close any open dialog
+  const handleCloseDialog = () => {
+    setOperationMode(null);
+    setTargetPage(null);
+    setParentPage(null);
+  };
+
+  // Handle edit/create dialog submission
   const handleSubmitPage = async (title: string) => {
     try {
-      if (dialogMode === "add") {
+      if (operationMode === "add") {
         await createPageMutation.mutateAsync({
           title,
           workspaceId: workspace.id,
+          parentId: parentPage?.id as string,
         });
         toast.success("Page created successfully!");
-      } else if (dialogMode === "edit" && currentPage) {
+      } else if (operationMode === "edit" && targetPage) {
         await updatePageMetadataMutation.mutateAsync({
-          id: currentPage.id,
+          id: targetPage.id,
           updateDto: { title },
         });
         toast.success("Page updated successfully!");
       }
-      setIsDialogOpen(false);
+      handleCloseDialog();
     } catch (error) {
-      console.error(`Failed to ${dialogMode} page:`, error);
-      toast.error(`Failed to ${dialogMode} page`);
+      console.error(`Failed to ${operationMode} page:`, error);
+      toast.error(`Failed to ${operationMode} page`);
     }
   };
 
@@ -83,6 +102,7 @@ export default function WorkspaceLayout() {
         workspace={workspace}
         onPageClick={handlePageClick}
         onAddPage={handleAddPage}
+        onDeletePage={handleDeletePage}
         onEditPage={handleEditPage}
         navigate={navigate}
       />
@@ -101,13 +121,20 @@ export default function WorkspaceLayout() {
         </main>
       </SidebarInset>
 
+      {/* Unified dialog rendering */}
       <PageDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        mode={dialogMode}
-        initialValue={currentPage?.title || ""}
+        open={isEditDialogOpen}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+        mode={operationMode === "add" ? "add" : "edit"}
+        initialValue={targetPage?.title || ""}
         isPending={createPageMutation.isPending || updatePageMetadataMutation.isPending}
         onSubmit={handleSubmitPage}
+      />
+
+      <DeletePageDialog 
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={(open) => !open && handleCloseDialog()}
+        page={targetPage}
       />
     </SidebarProvider>
   );

@@ -13,8 +13,9 @@ interface WorkspaceSidebarProps {
     pages: PageDto[];
   };
   onPageClick: (pageId: string) => void;
-  onAddPage: () => void;
+  onAddPage: (page?: PageDto) => void;
   onEditPage: (page: PageDto) => void;
+  onDeletePage: (page: PageDto) => void;
   navigate: NavigateFunction;
 }
 
@@ -23,6 +24,7 @@ export function WorkspaceSidebar({
   onPageClick,
   onAddPage,
   onEditPage,
+  onDeletePage,
   navigate,
 }: WorkspaceSidebarProps) {
   return (
@@ -36,12 +38,14 @@ export function WorkspaceSidebar({
           pages={workspace.pages} 
           onPageClick={onPageClick}
           onEditPage={onEditPage}
+          onAddPage={onAddPage}
+          onDeletePage={onDeletePage}
         />
       </SidebarContent>
       
       <SidebarFooter className="p-2">
         <Button
-          onClick={onAddPage}
+          onClick={() => onAddPage(undefined)}
           className="w-full"
           variant="outline"
           size="sm"

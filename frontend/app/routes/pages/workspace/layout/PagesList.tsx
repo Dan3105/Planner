@@ -1,15 +1,10 @@
-import { Pencil } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
-import { cn } from "~/lib/utils";
 import type { PageDto } from "~/api/dtos/page_dto";
-import { 
-  SidebarGroup, 
-  SidebarGroupLabel, 
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarGroupContent,
   SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarMenuAction
 } from "~/components/ui/sidebar";
 import {
   Accordion,
@@ -17,73 +12,66 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
+import { PageItem } from "./PageItem";
 
 interface PagesListProps {
   pages: PageDto[];
   onPageClick: (pageId: string) => void;
   onEditPage: (page: PageDto) => void;
+  onDeletePage: (page: PageDto) => void;
+  onAddPage: (page: PageDto) => void;
 }
 
-export function PagesList({ pages, onPageClick, onEditPage }: PagesListProps) {
+export function PagesList({
+  pages,
+  onPageClick,
+  onEditPage,
+  onDeletePage,
+  onAddPage,
+}: PagesListProps) {
   // Get root pages directly
-  const rootPages = pages.filter(page => !page.parentId);
-  
+  const rootPages = pages.filter((page) => !page.parentId);
+
   // Recursive component to render page hierarchy
   const renderPageTree = (page: PageDto, level = 0) => {
     const hasChildren = page.childs && page.childs.length > 0;
     if (!hasChildren) {
       return (
-        <SidebarMenuItem key={page.id}>
-          <SidebarMenuButton
-            onClick={() => onPageClick(page.id)}
-            tooltip={page.title}
-            isActive={false}
-            className={cn("pl-[calc(1rem*" + level + ")] hover:bg-gray-100")}
-          >
-            <span className="truncate text-sm font-medium text-gray-700">{page.title}</span>
-          </SidebarMenuButton>
-          <SidebarMenuAction
-            showOnHover
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditPage(page);
-            }}
-          >
-            <Pencil className="h-4 w-4 text-gray-500 hover:text-gray-700" />
-          </SidebarMenuAction>
-        </SidebarMenuItem>
+        <PageItem
+          page={page}
+          level={level}
+          onPageClick={onPageClick}
+          onEditPage={onEditPage}
+          onDeletePage={onDeletePage}
+          onAddPage={onAddPage}
+          key={page.id}
+        />
       );
     }
-    
+
     return (
       <AccordionItem value={page.id} key={page.id} className="border-0">
-        <AccordionTrigger className="p-0 hover:no-underline">
-          <SidebarMenuItem >
-            <SidebarMenuButton
-              onClick={(e) => {
-                e.stopPropagation(); // Prevent accordion from toggling
-                onPageClick(page.id);
-              }}
-              tooltip={page.title}
-              isActive={false}
-              className={cn("pl-[calc(1rem*" + level + ")] flex-1 hover:bg-gray-100")}
-            >
-              <span className="truncate text-sm font-medium text-gray-700">{page.title}</span>
-            </SidebarMenuButton>
-            <SidebarMenuAction
-              showOnHover
-              onClick={(e) => {
-                e.stopPropagation();
-                onEditPage(page);
-              }}
-            >
-              <Pencil className="h-4 w-4 text-gray-500 hover:text-gray-700" />
-            </SidebarMenuAction>
-          </SidebarMenuItem>
-        </AccordionTrigger>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <PageItem
+              page={page}
+              level={level}
+              onPageClick={onPageClick}
+              onEditPage={onEditPage}
+              onDeletePage={onDeletePage}
+              onAddPage={onAddPage}
+              key={page.id}
+            />
+          </div>
+          {hasChildren && (
+            <AccordionTrigger className="p-0 hover:no-underline flex-shrink-0">
+              {/* ChevronDown icon is rendered automatically by the AccordionTrigger */}
+            </AccordionTrigger>
+          )}
+        </div>
         <AccordionContent className="pt-1 pb-0">
           <SidebarMenu className="pl-4 space-y-1">
-            {page.childs.map(childPage => 
+            {page.childs.map((childPage) =>
               renderPageTree(childPage, level + 1)
             )}
           </SidebarMenu>
@@ -100,7 +88,7 @@ export function PagesList({ pages, onPageClick, onEditPage }: PagesListProps) {
       <SidebarGroupContent>
         <SidebarMenu className="space-y-1">
           <Accordion type="multiple" className="w-full">
-            {rootPages.map(page => renderPageTree(page))}
+            {rootPages.map((page) => renderPageTree(page))}
           </Accordion>
         </SidebarMenu>
       </SidebarGroupContent>

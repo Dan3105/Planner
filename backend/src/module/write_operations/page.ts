@@ -22,6 +22,10 @@ export async function deletePage(id: string): Promise<Page> {
 }
 
 export async function updateMetadataPage(id: string, dto: UpdatePageDto): Promise<Page> {
+    if (id === dto.parentId) {
+        throw new Error("A page cannot be its own parent");
+    }
+
     const page = await prisma.page.update({
         where: { id },
         data: {

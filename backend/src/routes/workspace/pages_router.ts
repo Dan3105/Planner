@@ -1,8 +1,24 @@
 import express from "express";
 import { createPage, deletePage, updateMetadataPage, updatePage } from "../../module/write_operations/page";
 import { CreatePageDto, UpdatePageDto } from "../../module/dtos/page_dto";
+import { getContentPage } from "../../module/read_operations/page";
 
 const pages_router = express.Router();
+
+// Get workspace by ID
+pages_router.get("/:id/content", async (req, res) => {
+    try {
+        const workspace = await getContentPage(req.params.id);
+        if (!workspace) {
+            res.status(404).json({ error: "Workspace not found" });
+            return;
+        }
+        res.json(workspace);
+    } catch (error) {
+        console.log('Error fetching workspace by ID:', error);
+        res.status(500).json({ error: "Failed to fetch workspaces" });
+    }
+});
 
 // Create new page
 pages_router.post("/", async (req, res) => {
