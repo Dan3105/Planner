@@ -6,7 +6,7 @@ import { useUpdatePageMetadata } from "~/api/workspace/write/useUpdatePageMetada
 import { toast } from "sonner";
 import type { PageDto } from "~/api/dtos/page_dto";
 
-import { SidebarProvider, SidebarInset } from "~/components/ui/sidebar";
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "~/components/ui/sidebar";
 import { WorkspaceSidebar } from "./WorkspaceSidebar";
 import { PageDialog } from "./PageDialog";
 import { DeletePageDialog } from "./DeletePageDialog";
@@ -112,6 +112,7 @@ export default function WorkspaceLayout() {
           <div className="flex justify-between items-center">
             <div className="flex gap-2 items-center">
               {/* SidebarTrigger moved to SidebarHeader component */}
+              <SidebarTrigger/>
             </div>
           </div>
         </div>
