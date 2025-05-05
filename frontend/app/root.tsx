@@ -12,6 +12,8 @@ import "./app.css";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ErrorPage from "./components/error-content";
 import { Toaster } from "sonner";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },

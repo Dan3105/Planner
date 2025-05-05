@@ -4,6 +4,7 @@ import {
   PopoverContent,
 } from "@radix-ui/react-popover";
 import { MoreVertical, Pencil, Plus, Trash2 } from "lucide-react";
+import { useParams } from "react-router";
 import { PageDto } from "~/api/dtos/page_dto";
 import { SidebarMenuItem, SidebarMenuButton } from "~/components/ui/sidebar";
 import { cn } from "~/lib/utils";
@@ -25,16 +26,19 @@ export function PageItem({
   onDeletePage,
   onAddPage,
 }: PageProps) {
+  const {pageId} = useParams();
+  const isActive = pageId === page.id;
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
         onClick={() => onPageClick(page.id)}
         tooltip={page.title}
-        isActive={false}
+        isActive={isActive}
         className={cn(
           "pl-[calc(1rem*" +
             level +
-            ")] hover:bg-gray-100 group flex justify-between"
+            ")] hover:bg-gray-100 group flex justify-between",
+          isActive && "!bg-gray-200 text-primary"
         )}
       >
         <span className="truncate text-sm font-medium text-gray-700">
