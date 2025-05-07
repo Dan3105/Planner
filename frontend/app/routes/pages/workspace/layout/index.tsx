@@ -45,7 +45,7 @@ export default function WorkspaceLayout() {
 
   // Navigate to page details
   const handlePageClick = (pageId: string) => {
-    navigate(`page/${pageId}`, { replace: true });
+    navigate(`/workspace/${workspaceId}/page/${pageId}`);
   };
 
   // Unified handlers for page operations

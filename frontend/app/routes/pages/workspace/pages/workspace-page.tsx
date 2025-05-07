@@ -11,9 +11,8 @@ import { useParams } from "react-router";
 import { useGetPageContent } from "~/api/workspace/read/useGetPageContent";
 import { useUpdatePageContent } from "~/api/workspace/write/useUpdatePageContent";
 import { BlockNoteView } from "@blocknote/mantine";
-import { PartialBlock } from "@blocknote/core";
-import { useCreateBlockNote } from "@blocknote/react";
-import { useState, useEffect } from "react";
+import { BlockNoteEditor, PartialBlock } from "@blocknote/core";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
 
 // Extracted smaller components
@@ -34,9 +33,7 @@ const PageHeader = ({ title }: PageHeaderProps) => (
     <div className="flex items-center justify-center w-10 h-10 rounded bg-gray-100 hover:bg-gray-200 cursor-pointer">
       <LucideFileText className="w-6 h-6 text-gray-600" />
     </div>
-    <h1 className="text-4xl font-bold w-full">
-      {title || "Untitled"}
-    </h1>
+    <h1 className="text-4xl font-bold w-full">{title || "Untitled"}</h1>
   </div>
 );
 
@@ -126,11 +123,16 @@ export default function WorkspacePage() {
   const { pageId } = useParams();
   const { data: page, isLoading } = useGetPageContent(pageId as string);
   const updatePageMutation = useUpdatePageContent();
-  const editor = useCreateBlockNote({
-    initialContent: page?.content
-      ? (JSON.parse(page?.content) as PartialBlock[])
-      : undefined,
-  });
+  const [initialContent, setInitialContent] = useState<
+    PartialBlock[] | undefined | "loading"
+  >("loading");
+  const editor = useMemo(() => {
+    if (initialContent === "loading") {
+      return undefined;
+    }
+    return BlockNoteEditor.create({ initialContent });
+  }, [initialContent]);
+
   const [hasChanges, setHasChanges] = useState(false);
 
   // Set up a change detector whenever editor is ready
@@ -150,11 +152,9 @@ export default function WorkspacePage() {
   }, [editor]);
 
   useEffect(() => {
-    if (editor)
-      editor.replaceBlocks(
-        editor.document,
-        page?.content ? (JSON.parse(page?.content) as PartialBlock[]) : []
-      );
+    setInitialContent(
+      page?.content ? (JSON.parse(page?.content) as PartialBlock[]) : undefined
+    );
   }, [page?.content]);
 
   const onSave = async () => {
@@ -189,9 +189,7 @@ export default function WorkspacePage() {
           <PageLoadingSkeleton />
         ) : (
           <>
-            <PageHeader
-              title={page?.title || "Untitled"}
-            />
+            <PageHeader title={page?.title || "Untitled"} />
 
             <PageMetadata
               lastEdited={formatRelativeTime(page?.updatedAt)}
@@ -201,11 +199,15 @@ export default function WorkspacePage() {
 
             {/* Content area */}
             <div className="w-full border-t pt-4">
-              <BlockNoteView
-                editor={editor}
-                theme={"light"}
-                className="min-h-[500px] prose max-w-none"
-              />
+              {editor ? (
+                <BlockNoteView
+                  editor={editor}
+                  theme={"light"}
+                  className="min-h-[500px] prose max-w-none"
+                />
+              ) : (
+                <div>Loading editor...</div>
+              )}
             </div>
           </>
         )}
